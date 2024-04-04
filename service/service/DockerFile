@@ -1,0 +1,23 @@
+FROM maven:3.8.3-openjdk-17 as builder
+
+ARG GIT_USER=Brandon-Romero
+
+ARG GIT_TOKEN=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
+
+WORKDIR /Service
+
+RUN git clone https://${GIT_USER}:${GIT_TOKEN}@github.com:Brandon-Romero/Distribuidos-DorckerFile.git
+
+WORKDIR /app/SpringBootForDocker/demo
+
+RUN mvn install package
+
+FROM openjdk:17-alpine
+
+RUN mkdir -p /app/Distribuidos-DorckerFile
+
+WORKDIR /app/Distribuidos-DorckerFile
+
+COPY --from=builder /app/Distribuidos-DorckerFile/service/service/target/*.jar ./api.jar
+
+ENTRYPOINT ["java", "-jar", "api.jar"]
